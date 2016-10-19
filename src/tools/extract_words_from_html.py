@@ -35,7 +35,7 @@ def extract_strings_from_node(html_node, list_of_strings):
     for child in html_node.children:
         extract_strings_from_node(child, list_of_strings)
 
-
+# TODO: extract all words + detect language
 @click.command()
 @click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
 @click.argument('output-file-path', type=click.Path(exists=False, dir_okay=False))
