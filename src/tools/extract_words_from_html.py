@@ -1,7 +1,14 @@
 import click
 
 
-SKIPPED_TAGS = ['img', 'form', 'input', 'br', 'button']
+SKIPPED_TAGS = [
+    'area', 'audio', 'br', 'button', 'canvas',
+    'code', 'fieldset', 'form', 'img', 'input',
+    'keygen', 'map', 'meter', 'noscript',
+    'object', 'output', 'param', 'progress',
+    'script', 'source', 'style', 'textarea',
+    'time', 'track', 'video', 'wbr'
+]
 
 
 @click.command()
