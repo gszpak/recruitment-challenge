@@ -2,7 +2,7 @@ import os
 
 import click
 import ujson
-from bs4 import NavigableString, BeautifulSoup
+from bs4 import NavigableString, BeautifulSoup, Comment
 
 SKIPPED_TAGS = {
     'area', 'audio', 'br', 'button', 'canvas',
@@ -18,7 +18,7 @@ def _extract_description_from_meta(html_node, bag_of_strings):
     if html_node.name != 'meta':
         return
     name = html_node.get('name')
-    if name is None or 'description' not in name.lower():
+    if name is None or ('description' not in name.lower() and 'keywords' not in name.lower()):
         return
     content = html_node.get('content')
     if content is not None:
@@ -27,10 +27,12 @@ def _extract_description_from_meta(html_node, bag_of_strings):
 
 def extract_strings_from_node(html_node, list_of_strings):
     # NavigableString is a subclass of unicode
-    if html_node.name in SKIPPED_TAGS:
+    if html_node.name in SKIPPED_TAGS or isinstance(html_node, Comment):
         return
     if isinstance(html_node, NavigableString):
-        list_of_strings.append(html_node)
+        # skip empty string and BOM
+        if not html_node.isspace() and html_node != u'\ufeff':
+            list_of_strings.append(html_node.strip())
         return
     for child in html_node.children:
         extract_strings_from_node(child, list_of_strings)
@@ -53,3 +55,7 @@ def extract_text_from_html(input_file_path, output_file_path):
             }
             line = ujson.dumps(result_json) + os.linesep
             output_file.write(line)
+
+
+if __name__ == '__main__':
+    extract_text_from_html()
