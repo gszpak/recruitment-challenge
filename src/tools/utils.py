@@ -1,9 +1,6 @@
 import ujson
 
 import numpy as np
-from bs4 import BeautifulSoup
-import langdetect
-from langdetect.lang_detect_exception import LangDetectException
 from matplotlib import pyplot as plot
 
 
@@ -16,24 +13,6 @@ def traverse_tree(tree_node, fun_on_node, *fun_args, **fun_kwargs):
     fun_on_node(tree_node, *fun_args, **fun_kwargs)
     for child in tree_node.children:
         traverse_tree(child, fun_on_node, *fun_args, **fun_kwargs)
-
-
-def detect_language(instance_as_json):
-    assert 'html' in instance_as_json or 'description' in instance_as_json
-    if 'html' in instance_as_json:
-        html_tree = BeautifulSoup(instance_as_json['html'], 'html.parser')
-        for descendant in html_tree.descendants:
-            if descendant.name == 'html':
-                if descendant.has_attr('lang'):
-                    return descendant.get('lang')
-                else:
-                    break
-    try:
-        if 'description' in instance_as_json:
-            return langdetect.detect(instance_as_json['description'])
-    except LangDetectException:
-        print instance_as_json['description']
-    return 'en'
 
 
 def plot_distr(tags_distr):
