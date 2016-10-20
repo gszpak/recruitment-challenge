@@ -3,3 +3,5 @@ ujson==1.35
 beautifulsoup4==4.5.1
 matplotlib==1.5.3
 langdetect==1.0.1
+nltk==3.2.1
+translate==2.0.0

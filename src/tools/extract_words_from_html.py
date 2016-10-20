@@ -4,6 +4,7 @@ import click
 import ujson
 
 import langdetect
+import nltk
 from bs4 import NavigableString, BeautifulSoup, Comment
 from langdetect.lang_detect_exception import LangDetectException
 
@@ -21,7 +22,7 @@ class HTMLTransformer(object):
 
     def __init__(self, html_as_str):
         parsed_html = BeautifulSoup(html_as_str, 'html.parser')
-        self.html = self._get_html_root(parsed_html)
+        self.html_roots = self._get_html_roots(parsed_html)
         self._html_lang = None
 
     @property
@@ -30,20 +31,15 @@ class HTMLTransformer(object):
             self._html_lang = self._get_html_lang()
         return self._html_lang
 
-    def _get_html_root(self, html_tree):
-        all_html = list(html_tree.find_all('html'))
-        if not all_html:
-            return None
-        #assert len(all_html) == 1
-        return all_html[0]
+    def _get_html_roots(self, html_tree):
+        return list(html_tree.find_all('html'))
 
     def _get_html_lang(self):
-        if self.html is None:
-            return None
-        if self.html.has_attr('lang'):
-            return self.html.get('lang')
-        if self.html.has_attr('LANG'):
-            return self.html.get('LANG')
+        for html_root in self.html_roots:
+            if html_root.has_attr('lang'):
+                return html_root.get('lang')
+            if html_root.has_attr('LANG'):
+                return html_root.get('LANG')
         return None
 
     def _extract_description_from_meta(self, html_node, set_of_strings):
@@ -55,9 +51,9 @@ class HTMLTransformer(object):
             set_of_strings.add(content)
 
     def _extract_strings_from_node(self, html_node, set_of_strings):
-        # NavigableString is a subclass of unicode
         if isinstance(html_node, Comment):
             return
+        # NavigableString is a subclass of unicode
         if isinstance(html_node, NavigableString):
             # skip empty string and BOM
             str_to_add = html_node.strip()
@@ -73,16 +69,30 @@ class HTMLTransformer(object):
         for child in html_node.children:
             self._extract_strings_from_node(child, set_of_strings)
 
-    def get_strings_from_html(self):
-        if self.html is None:
-            return []
+    def get_string_from_html(self):
         html_strings = set()
-        self._extract_strings_from_node(self.html, html_strings)
+        for html_root in self.html_roots:
+            self._extract_strings_from_node(html_root, html_strings)
         # TODO: detect unavailable sites
-        return list(html_strings)
+        return ' '.join(list(html_strings))
 
 
-def detect_language(description, html_text):
+def _convert_to_words(string):
+    result = []
+    sentences = nltk.sent_tokenize(string)
+    for sentence in sentences:
+        result.extend(nltk.word_tokenize(sentence))
+    return result
+
+# TODO:
+# - convert unicode quote
+# - translation of raw string
+# - eliminating all words containing something other than: alphanum, ', -
+# - convert words to base form
+# - leave only nouns and adjectives
+
+
+def _detect_language(description, html_text):
     try:
         return langdetect.detect(description)
     except LangDetectException:
@@ -104,14 +114,14 @@ def extract_text_from_html(input_file_path, output_file_path):
         for row in input_file:
             json = ujson.loads(row)
             html_transformer = HTMLTransformer(json['html'])
-            html_strings = html_transformer.get_strings_from_html()
+            string_from_html = html_transformer.get_string_from_html()
             description = json['description']
             language = html_transformer.html_lang
             if language is None:
-                language = detect_language(description, ' '.join(html_strings))
+                language = _detect_language(description, ' '.join(string_from_html))
             result_json = {
-                'html': html_strings,
-                'description': description,
+                'html': _convert_to_words(string_from_html),
+                'description': _convert_to_words(description),
                 'language': language,
                 'industry': json['industry']
             }
