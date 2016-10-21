@@ -1,12 +1,7 @@
-from distutils.core import setup
+from setuptools import find_packages, setup
 
 setup(
     name='recruitment-challenge',
-    version='',
-    packages=['src', 'src.tools'],
-    url='',
-    license='',
-    author='gszpak',
-    author_email='',
-    description=''
+    version='1.0',
+    packages=find_packages()
 )

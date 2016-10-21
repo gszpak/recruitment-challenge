@@ -2,3 +2,5 @@
 .DS_Store
 data/*
 *.pyc
+*.jsons
+*egg-info
