@@ -27,7 +27,6 @@ def extract_text_from_html(input_file_path, output_file_path):
             line = ujson.dumps(result_json) + os.linesep
             output_file.write(line)
             progress += 1
-            #if progress % 100 == 0:
             print 'Progress: {}'.format(progress)
 
 

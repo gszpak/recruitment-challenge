@@ -114,12 +114,10 @@ class TranslatorTransformer(JsonTransformer):
         # en-US is the default value of en
         if from_lang == 'en' or from_lang == 'en-US' or from_lang == 'en-GB':
             return text
-        result = self._translator_rest_service.translate(
+        return self._translator_rest_service.translate(
             text,
             from_lang=from_lang
         )
-        print result
-        return result
 
     def transform(self, json):
         html_translated = self._translate(json['html'], json['html_language'])
