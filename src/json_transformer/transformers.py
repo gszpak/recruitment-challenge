@@ -40,9 +40,9 @@ class HtmlJsonTransformer(JsonTransformer):
     def _get_html_lang(self, html_roots):
         for html_root in html_roots:
             if html_root.has_attr('lang'):
-                return html_root.get('lang')
+                return html_root.get('lang').lower()
             if html_root.has_attr('LANG'):
-                return html_root.get('LANG')
+                return html_root.get('LANG').lower()
         return None
 
     def _extract_description_from_meta(self, html_node, set_of_strings):
