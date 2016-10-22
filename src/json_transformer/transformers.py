@@ -1,11 +1,11 @@
 import re
 
-import functools
 import langdetect
 import nltk
 from bs4 import BeautifulSoup, Comment, NavigableString
 from langdetect.lang_detect_exception import LangDetectException
-from translate import translator
+
+from src.translator_rest.translator_rest_service import TranslatorRestService
 
 
 class JsonTransformer(object):
@@ -77,51 +77,56 @@ class HtmlJsonTransformer(JsonTransformer):
         # TODO: detect unavailable sites
         return ' '.join(list(html_strings))
 
-    def _detect_language(self, html_roots, html_text, description):
+    def _detect_language(self, text):
+        try:
+            return langdetect.detect(text)
+        except LangDetectException:
+            return 'en'
+
+    def _detect_html_language(self, html_roots, html_text):
         lang_from_html = self._get_html_lang(html_roots)
         if lang_from_html is not None:
             return lang_from_html
-        try:
-            return langdetect.detect(description)
-        except LangDetectException:
-            pass
-        try:
-            return langdetect.detect(html_text)
-        except LangDetectException:
-            pass
-        return 'en'
+        return self._detect_language(html_text)
 
     def transform(self, json):
         parsed_html = BeautifulSoup(json['html'], 'html.parser')
         html_roots = self._get_html_roots(parsed_html)
         string_from_html = self._get_string_from_html(html_roots)
         description = json['description']
-        language = self._detect_language(html_roots, string_from_html, description)
+        html_language = self._detect_html_language(html_roots, string_from_html)
+        description_language = self._detect_language(description)
         return {
             'html': string_from_html,
             'description': description,
-            'language': language,
+            'html_language': html_language,
+            'description_language': description_language,
             'industry': json['industry']
         }
 
 
 class TranslatorTransformer(JsonTransformer):
 
-    @staticmethod
-    def _translate(text, translator_fun):
-        text_parts = text.split()
-        translated_parts = map(translator_fun, text_parts)
-        return ' '.join(translated_parts)
+    def __init__(self):
+        self._translator_rest_service = TranslatorRestService()
+
+    def _translate(self, text, from_lang):
+        # en-US is the default value of en
+        if from_lang == 'en' or from_lang == 'en-US' or from_lang == 'en-GB':
+            return text
+        result = self._translator_rest_service.translate(
+            text,
+            from_lang=from_lang
+        )
+        print result
+        return result
 
     def transform(self, json):
-        language = json['language']
-        # en-US is the default value of en
-        if language == 'en' or language == 'en-US':
-            return json
-        translator_fun = functools.partial(translator, language, 'en-US')
+        html_translated = self._translate(json['html'], json['html_language'])
+        description_translated = self._translate(json['description'], json['description_language'])
         return {
-            'html': self._translate(json['html'].encode('utf-8'), translator_fun),
-            'description': self._translate(json['description'].encode('utf-8'), translator_fun),
+            'html': html_translated,
+            'description': description_translated,
             'industry': json['industry']
         }
 
