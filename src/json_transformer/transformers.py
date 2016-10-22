@@ -2,6 +2,7 @@ import re
 
 import langdetect
 import nltk
+import pycountry
 import unidecode
 from bs4 import BeautifulSoup, Comment, NavigableString
 from langdetect.lang_detect_exception import LangDetectException
@@ -35,15 +36,29 @@ class HtmlJsonTransformer(JsonTransformer):
         'time', 'track', 'video', 'wbr'
     }
 
+    _LANGUAGES = set(
+        [lang.iso639_1_code for lang in pycountry.languages
+         if hasattr(lang, 'iso639_1_code')]
+    )
+
     def _get_html_roots(self, parsed_html):
         return list(parsed_html.find_all('html'))
+
+    def _check_lang_code(self, lang_code):
+        if len(lang_code) < 2:
+            return False
+        return lang_code[:2] in self._LANGUAGES
 
     def _get_html_lang(self, html_roots):
         for html_root in html_roots:
             if html_root.has_attr('lang'):
-                return html_root.get('lang').lower()
+                lang = html_root.get('lang').lower()
+                if self._check_lang_code(lang):
+                    return lang
             if html_root.has_attr('LANG'):
-                return html_root.get('LANG').lower()
+                lang = html_root.get('LANG').lower()
+                if self._check_lang_code(lang):
+                    return lang
         return None
 
     def _extract_description_from_meta(self, html_node, set_of_strings):
@@ -160,7 +175,7 @@ class TokenizerTransformer(JsonTransformer):
 
 class NonWordsEliminatorTransformer(JsonTransformer):
 
-    _WORD_REGEX = re.compile(r'^[a-zA-Z0-9\-\']+$')
+    _WORD_REGEX = re.compile(r'^[a-zA-Z0-9\-\'/]+$')
 
     @staticmethod
     def _is_word(word):

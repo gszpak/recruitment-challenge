@@ -24,7 +24,7 @@ class TranslatorRestService(object):
                     return response.json()['translationText']
             except requests.RequestException:
                 pass
-        print "WARNING: chunk not translated"
+        print("WARNING: chunk not translated")
 
     def translate(self, text, from_lang='en-US', to_lang='en-US'):
         text_words = text.split()

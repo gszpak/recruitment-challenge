@@ -11,14 +11,14 @@ from src.json_transformer.transformers import HtmlJsonTransformer, TranslatorTra
 @click.command()
 @click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
 @click.argument('output-file-path', type=click.Path(exists=False, dir_okay=False))
-def extract_text_from_html(input_file_path, output_file_path):
+def run_transform_jsons(input_file_path, output_file_path):
     pipeline = JsonTransformerPipeline(
         HtmlJsonTransformer(),
         TranslatorTransformer(),
-        # UnidecodeTransformer(),
-        # TokenizerTransformer(),
-        # NonWordsEliminatorTransformer(),
-        # LematizationTransformer(),
+        UnidecodeTransformer(),
+        TokenizerTransformer(),
+        NonWordsEliminatorTransformer(),
+        LematizationTransformer(),
     )
     with open(input_file_path, 'r') as input_file, open(output_file_path, 'w') as output_file:
         progress = 0
@@ -28,8 +28,9 @@ def extract_text_from_html(input_file_path, output_file_path):
             line = ujson.dumps(result_json) + os.linesep
             output_file.write(line)
             progress += 1
-            print 'Progress: {}'.format(progress)
+            if progress % 100 == 0:
+                print('Progress: {}'.format(progress))
 
 
 if __name__ == '__main__':
-    extract_text_from_html()
+    run_transform_jsons()
