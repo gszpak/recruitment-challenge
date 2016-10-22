@@ -2,6 +2,7 @@ import re
 
 import langdetect
 import nltk
+import unidecode
 from bs4 import BeautifulSoup, Comment, NavigableString
 from langdetect.lang_detect_exception import LangDetectException
 
@@ -125,6 +126,16 @@ class TranslatorTransformer(JsonTransformer):
         return {
             'html': html_translated,
             'description': description_translated,
+            'industry': json['industry']
+        }
+
+
+class UnidecodeTransformer(JsonTransformer):
+
+    def transform(self, json):
+        return {
+            'html': unidecode.unidecode(json['html']),
+            'description': unidecode.unidecode(json['description']),
             'industry': json['industry']
         }
 

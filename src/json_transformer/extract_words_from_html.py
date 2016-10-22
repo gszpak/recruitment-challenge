@@ -5,7 +5,7 @@ import click
 
 from src.json_transformer.pipeline import JsonTransformerPipeline
 from src.json_transformer.transformers import HtmlJsonTransformer, TranslatorTransformer, TokenizerTransformer, \
-    NonWordsEliminatorTransformer, LematizationTransformer
+    NonWordsEliminatorTransformer, LematizationTransformer, UnidecodeTransformer
 
 
 @click.command()
@@ -15,6 +15,7 @@ def extract_text_from_html(input_file_path, output_file_path):
     pipeline = JsonTransformerPipeline(
         HtmlJsonTransformer(),
         TranslatorTransformer(),
+        # UnidecodeTransformer(),
         # TokenizerTransformer(),
         # NonWordsEliminatorTransformer(),
         # LematizationTransformer(),

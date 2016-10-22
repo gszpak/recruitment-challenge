@@ -5,3 +5,4 @@ matplotlib==1.5.3
 langdetect==1.0.1
 nltk==3.2.1
 requests==2.11.1
+unidecode==0.04.19
