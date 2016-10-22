@@ -18,9 +18,13 @@ class TranslatorRestService(object):
             'to': to_lang
         }
         for _ in xrange(self._NUM_OF_RETRIES):
-            response = requests.post(self.TRANSLTR_API_URL, json=json)
-            if response.status_code == 200:
-                return response.json()['translationText']
+            try:
+                response = requests.post(self.TRANSLTR_API_URL, json=json)
+                if response.status_code == 200:
+                    return response.json()['translationText']
+            except requests.RequestException:
+                pass
+        print "WARNING: chunk not translated"
 
     def translate(self, text, from_lang='en-US', to_lang='en-US'):
         text_words = text.split()
