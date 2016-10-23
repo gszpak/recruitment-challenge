@@ -1,21 +1,17 @@
 import nltk
 
-# TODO classifier pipeline:
-# - read as (list of tokens, label)
-# - POS tagging transformer
-# - list of tokens -> lowercase string
-# - countVectorizer with lemmatization / stemming
-# - tf-idf
-# - SVC
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
+# TODO: move it to CountVectorizer's tokenizer
 class PosSelectorTransformer(BaseEstimator, TransformerMixin):
     """
     Chooses only given parts of speech (POS) from list of words
     """
 
-    def __init__(self, enabled_pos):
+    def __init__(self, enabled_pos=None):
+        if enabled_pos is None:
+            enabled_pos = []
         self.enabled_pos = set(enabled_pos)
 
     def get_params(self, deep=True):
@@ -38,7 +34,7 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
         for word, tag in pos_tagged_words:
             if tag in self.enabled_pos:
                 result.append(word)
-        return result
+        return ' '.join(result)
 
     def transform(self, X):
         print('{} start'.format(self.__class__.__name__))
@@ -48,3 +44,12 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
             if i % 100 == 0:
                 print('Progress: {}'.format(i))
         return result
+
+
+class LemmaTokenizer(object):
+
+    def __init__(self):
+        self.lemmatizer = nltk.stem.WordNetLemmatizer()
+
+    def __call__(self, doc):
+        return [self.lemmatizer.lemmatize(word) for word in nltk.word_tokenize(doc)]
