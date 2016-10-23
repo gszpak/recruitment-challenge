@@ -3,3 +3,4 @@
 - Selecting parts of speech
 - Stemming instead of lemmatization
 - different methods for weighting terms: http://kmi.open.ac.uk/publications/papers/kmi-tr-128.pdf
+- feature selection (chi2)

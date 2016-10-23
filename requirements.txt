@@ -7,3 +7,5 @@ nltk==3.2.1
 requests==2.11.1
 unidecode==0.04.19
 pycountry==1.20
+scikit-learn==0.18
+scipy==0.18.1
