@@ -11,8 +11,9 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
 
     def __init__(self, enabled_pos=None):
         if enabled_pos is None:
-            enabled_pos = []
-        self.enabled_pos = set(enabled_pos)
+            self.enabled_pos = set()
+        else:
+            self.enabled_pos = set(enabled_pos)
 
     def get_params(self, deep=True):
         return {
@@ -20,7 +21,7 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
         }
 
     def set_params(self, **kwargs):
-        for param_name, param_val in kwargs:
+        for param_name, param_val in kwargs.items():
             setattr(self, param_name, param_val)
         return self
 
@@ -37,13 +38,7 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
         return ' '.join(result)
 
     def transform(self, X):
-        print('{} start'.format(self.__class__.__name__))
-        result = []
-        for i, words in enumerate(X):
-            result.append(self._filter_list_of_words(words))
-            if i % 100 == 0:
-                print('Progress: {}'.format(i))
-        return result
+        return [self._filter_list_of_words(words) for words in X]
 
 
 class LemmaTokenizer(object):
