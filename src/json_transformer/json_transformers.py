@@ -197,7 +197,7 @@ class StripNonAlphanumericTransformer(JsonTransformer):
 
 class NonWordsEliminatorTransformer(JsonTransformer):
 
-    _WORD_REGEX = re.compile(r'^[a-zA-Z0-9\-\'/]+$')
+    _WORD_REGEX = re.compile(r'^[a-zA-Z0-9\-\']+$')
 
     @staticmethod
     def _is_word(word):
