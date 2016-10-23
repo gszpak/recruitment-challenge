@@ -4,8 +4,8 @@ import ujson
 import click
 
 from src.json_transformer.pipeline import JsonTransformerPipeline
-from src.json_transformer.transformers import HtmlJsonTransformer, TranslatorTransformer, TokenizerTransformer, \
-    NonWordsEliminatorTransformer, LematizationTransformer, UnidecodeTransformer
+from src.json_transformer.json_transformers import HtmlJsonTransformer, TranslatorTransformer, TokenizerTransformer, \
+    NonWordsEliminatorTransformer, UnidecodeTransformer, StripNonAlphanumericTransformer
 
 
 @click.command()
@@ -17,8 +17,8 @@ def run_transform_jsons(input_file_path, output_file_path):
         TranslatorTransformer(),
         UnidecodeTransformer(),
         TokenizerTransformer(),
+        StripNonAlphanumericTransformer(),
         NonWordsEliminatorTransformer(),
-        LematizationTransformer(),
     )
     with open(input_file_path, 'r') as input_file, open(output_file_path, 'w') as output_file:
         progress = 0

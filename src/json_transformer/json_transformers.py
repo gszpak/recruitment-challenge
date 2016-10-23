@@ -1,4 +1,5 @@
 import re
+import string
 
 import langdetect
 import nltk
@@ -173,6 +174,27 @@ class TokenizerTransformer(JsonTransformer):
         }
 
 
+class StripNonAlphanumericTransformer(JsonTransformer):
+
+    _ENABLED_CHARS = set(string.ascii_letters + string.digits)
+
+    def _transform_word(self, word):
+        chars_to_strip = ''.join(set(word) - self._ENABLED_CHARS)
+        result = word.strip(chars_to_strip)
+        return result
+
+    def _transform_words(self, words):
+        words = map(self._transform_word, words)
+        return list(filter(lambda word: len(word) > 1, words))
+
+    def transform(self, json):
+        return {
+            'html': self._transform_words(json['html']),
+            'description': self._transform_words(json['description']),
+            'industry': json['industry']
+        }
+
+
 class NonWordsEliminatorTransformer(JsonTransformer):
 
     _WORD_REGEX = re.compile(r'^[a-zA-Z0-9\-\'/]+$')
@@ -189,24 +211,5 @@ class NonWordsEliminatorTransformer(JsonTransformer):
         return {
             'html': self._filter_non_words(json['html']),
             'description': self._filter_non_words(json['description']),
-            'industry': json['industry']
-        }
-
-
-class LematizationTransformer(JsonTransformer):
-
-    def __init__(self):
-        self.lemmatizer = nltk.stem.WordNetLemmatizer()
-
-    def _lemmatize_word(self, word):
-        return self.lemmatizer.lemmatize(word)
-
-    def _lemmatize_words(self, words):
-        return map(self._lemmatize_word, words)
-
-    def transform(self, json):
-        return {
-            'html': self._lemmatize_words(json['html']),
-            'description': self._lemmatize_words(json['description']),
             'industry': json['industry']
         }
