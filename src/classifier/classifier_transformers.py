@@ -3,7 +3,6 @@ import nltk
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
-# TODO: move it to CountVectorizer's tokenizer
 class PosSelectorTransformer(BaseEstimator, TransformerMixin):
     """
     Chooses only given parts of speech (POS) from list of words

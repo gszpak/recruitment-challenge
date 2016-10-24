@@ -11,7 +11,7 @@ from langdetect.lang_detect_exception import LangDetectException
 from src.translator_rest.translator_rest_service import TranslatorRestService
 
 
-class JsonTransformer(object):
+class JsonTransformer:
 
     def transform(self, json):
         """
@@ -91,7 +91,6 @@ class HtmlJsonTransformer(JsonTransformer):
         html_strings = set()
         for html_root in html_roots:
             self._extract_strings_from_node(html_root, html_strings)
-        # TODO: detect unavailable sites
         return ' '.join(list(html_strings))
 
     def _detect_language(self, text):

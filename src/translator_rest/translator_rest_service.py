@@ -1,7 +1,7 @@
 import requests
 
 
-class TranslatorRestService(object):
+class TranslatorRestService:
 
     TRANSLTR_API_URL = 'http://www.transltr.org/api/translate'
     _NUM_OF_RETRIES = 10

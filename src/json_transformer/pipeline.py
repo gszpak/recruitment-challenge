@@ -1,5 +1,5 @@
 
-class JsonTransformerPipeline(object):
+class JsonTransformerPipeline:
 
     def __init__(self, *transformers):
         self.transfomers = transformers

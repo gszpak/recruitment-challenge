@@ -18,14 +18,15 @@ def run_transform_jsons(input_file_path, output_file_path):
         NonWordsEliminatorTransformer(),
     )
     with open(input_file_path, 'r') as input_file, open(output_file_path, 'w') as output_file:
-        progress = 0
-        for row in input_file:
+        for progress, row in enumerate(input_file):
             json = ujson.loads(row)
             result_json = pipeline.transform(json)
             line = ujson.dumps(result_json) + os.linesep
             output_file.write(line)
             progress += 1
-            print('Progress: {}'.format(progress))
+            if progress % 100 == 0:
+                print('Progress: {}'.format(progress))
+
 
 @click.command()
 @click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
