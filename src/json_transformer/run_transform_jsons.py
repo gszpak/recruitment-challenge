@@ -11,7 +11,7 @@ from src.json_transformer.json_transformers import HtmlJsonTransformer, Translat
 def run_transform_jsons(input_file_path, output_file_path):
     pipeline = JsonTransformerPipeline(
         HtmlJsonTransformer(),
-        # TranslatorTransformer(),
+        TranslatorTransformer(),
         UnidecodeTransformer(),
         TokenizerTransformer(),
         StripNonAlphanumericTransformer(),

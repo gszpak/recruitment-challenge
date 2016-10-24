@@ -159,9 +159,9 @@ class UnidecodeTransformer(JsonTransformer):
 class TokenizerTransformer(JsonTransformer):
 
     @staticmethod
-    def _convert_to_words(string):
+    def _convert_to_words(string_):
         result = []
-        sentences = nltk.sent_tokenize(string)
+        sentences = nltk.sent_tokenize(string_)
         for sentence in sentences:
             result.extend(nltk.word_tokenize(sentence))
         return result
