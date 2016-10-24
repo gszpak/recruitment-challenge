@@ -40,7 +40,7 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
         return [self._filter_list_of_words(words) for words in X]
 
 
-class LemmaTokenizer(object):
+class LemmaTokenizer:
 
     def __init__(self):
         self.lemmatizer = nltk.stem.WordNetLemmatizer()
