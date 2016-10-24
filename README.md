@@ -8,8 +8,8 @@ The whole classification process consists of two main steps:
 
     This step is performed by running run_transform_jsons.py script.
 
-    WARNING: as translation step uses external API, it takes A LOT of time to complete.
-    You will find translated jsons after performing 2 first substeps in data/companies_translated.txt
+    WARNING: as translation step uses an external API, the whole step takes A LOT of time to complete.
+    You will find a gzipped file with jsons transformed by this step in data/companies_transformed.jsons.gz
 
 
 2. Building final model and running 3 - fold cross-validation (classifier package). This includes:
