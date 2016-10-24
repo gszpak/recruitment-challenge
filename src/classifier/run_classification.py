@@ -14,10 +14,6 @@ NOUNS = ['NN', 'NNP', 'NNS', 'NNPS']
 ADVERBS = ['RB', 'RBR', 'RBS']
 VERBS = ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
 
-# TODO classifier pipeline:
-# - LSA before tf-idf
-# - SVC
-
 
 def _read_x_y(input_file_path):
     X, y = [], []
@@ -29,8 +25,6 @@ def _read_x_y(input_file_path):
     return X, y
 
 
-@click.command()
-@click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
 def run_classification(input_file_path):
     pipeline = Pipeline([
         ('pos_selection', PosSelectorTransformer()),
@@ -62,7 +56,7 @@ def run_classification(input_file_path):
         param_grid={
             'pos_selection__enabled_pos': [(NOUNS + VERBS)],
             'tfidf__use_idf': [True],
-            'svm__alpha': [0.0001, 0.00001]
+            'svm__alpha': [0.0001]
         },
         cv=3,
         verbose=10,
@@ -73,5 +67,12 @@ def run_classification(input_file_path):
     print('CV accuracy: {}'.format(grid_search.best_score_))
 
 
+@click.command()
+@click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
+def main(input_file_path):
+    run_classification(input_file_path)
+
+
 if __name__ == '__main__':
-    run_classification()
+    main()
+

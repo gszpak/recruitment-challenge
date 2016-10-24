@@ -8,7 +8,7 @@ class TranslatorRestService(object):
     _CHUNK_SIZE = 30
 
     def _generate_chunk(self, text_words):
-        for i in xrange(0, len(text_words), self._CHUNK_SIZE):
+        for i in range(0, len(text_words), self._CHUNK_SIZE):
             yield ' '.join(text_words[i:i + self._CHUNK_SIZE])
 
     def _translate_chunk(self, text_chunk, from_lang, to_lang):
@@ -17,7 +17,7 @@ class TranslatorRestService(object):
             'from': from_lang,
             'to': to_lang
         }
-        for _ in xrange(self._NUM_OF_RETRIES):
+        for _ in range(self._NUM_OF_RETRIES):
             try:
                 response = requests.post(self.TRANSLTR_API_URL, json=json)
                 if response.status_code == 200:

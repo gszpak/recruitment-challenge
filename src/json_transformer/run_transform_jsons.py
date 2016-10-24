@@ -8,13 +8,10 @@ from src.json_transformer.json_transformers import HtmlJsonTransformer, Translat
     NonWordsEliminatorTransformer, UnidecodeTransformer, StripNonAlphanumericTransformer
 
 
-@click.command()
-@click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
-@click.argument('output-file-path', type=click.Path(exists=False, dir_okay=False))
 def run_transform_jsons(input_file_path, output_file_path):
     pipeline = JsonTransformerPipeline(
         HtmlJsonTransformer(),
-        TranslatorTransformer(),
+        # TranslatorTransformer(),
         UnidecodeTransformer(),
         TokenizerTransformer(),
         StripNonAlphanumericTransformer(),
@@ -28,9 +25,14 @@ def run_transform_jsons(input_file_path, output_file_path):
             line = ujson.dumps(result_json) + os.linesep
             output_file.write(line)
             progress += 1
-            if progress % 100 == 0:
-                print('Progress: {}'.format(progress))
+            print('Progress: {}'.format(progress))
+
+@click.command()
+@click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
+@click.argument('output-file-path', type=click.Path(exists=False, dir_okay=False))
+def main(input_file_path, output_file_path):
+    run_transform_jsons(input_file_path, output_file_path)
 
 
 if __name__ == '__main__':
-    run_transform_jsons()
+    main()
