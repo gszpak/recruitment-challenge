@@ -20,7 +20,7 @@ def _read_x_y(input_file_path):
     with open(input_file_path, 'r') as input_file:
         for row in input_file:
             json = ujson.loads(row)
-            X.append(' '.join(json['html'] + json['description']))
+            X.append(json['html'] + json['description'])
             y.append(json['industry'])
     return X, y
 
