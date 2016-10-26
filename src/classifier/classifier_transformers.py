@@ -9,6 +9,7 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, enabled_pos=None):
+        self.lemmatizer = nltk.stem.WordNetLemmatizer()
         if enabled_pos is None:
             self.enabled_pos = set()
         else:
@@ -33,11 +34,15 @@ class PosSelectorTransformer(BaseEstimator, TransformerMixin):
         result = []
         for word, tag in pos_tagged_words:
             if tag in self.enabled_pos:
-                result.append(word)
+                result.append(self.lemmatizer.lemmatize(word))
         return ' '.join(result)
 
     def transform(self, X):
-        return [self._filter_list_of_words(words) for words in X]
+        result = []
+        for progress, words in enumerate(X):
+            result.append(self._filter_list_of_words(words))
+            print(progress)
+        return result
 
 
 class LemmaTokenizer:

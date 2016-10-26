@@ -1,3 +1,4 @@
+import os
 import ujson
 
 import click
@@ -20,18 +21,18 @@ def _read_x_y(input_file_path):
     with open(input_file_path, 'r') as input_file:
         for row in input_file:
             json = ujson.loads(row)
-            X.append(' '.join(json['html'] + json['description']))
+            X.append(json['html'] + json['description'])
             y.append(json['industry'])
     return X, y
 
 
-def run_classification(input_file_path):
+def run_classification(input_file_path, output_file_path):
     pipeline = Pipeline([
-        ('pos_selection', PosSelectorTransformer()),
+        ('pos_selection', PosSelectorTransformer(enabled_pos=(NOUNS + VERBS + ADJECTIVES + ADVERBS))),
         # Words were lowercased in PosSelectorTransformer
-        ('vectorization', CountVectorizer(tokenizer=LemmaTokenizer(), lowercase=False)),
-        ('tfidf', TfidfTransformer()),
-        ('svm', SGDClassifier(loss='hinge', penalty='l2'))
+        # ('vectorization', CountVectorizer(tokenizer=LemmaTokenizer(), lowercase=False)),
+        # ('tfidf', TfidfTransformer()),
+        # ('svm', SGDClassifier(loss='hinge', penalty='l2'))
     ])
     # This would be a parameter grid to search, but it takes a lot of time to build a model
     param_grid = [
@@ -63,14 +64,23 @@ def run_classification(input_file_path):
         n_jobs=-1
     )
     X, y = _read_x_y(input_file_path)
-    grid_search.fit(X, y)
-    print('CV accuracy: {}'.format(grid_search.best_score_))
+    # grid_search.fit(X, y)
+    # print('CV accuracy: {}'.format(grid_search.best_score_))
+    X_tr = pipeline.transform(X)
+    with open(output_file_path, 'w') as output_file:
+        for text, industry in zip(X_tr, y):
+            json = ujson.dumps({
+                'text': text,
+                'industry': industry
+            })
+            output_file.write(json + os.linesep)
 
 
 @click.command()
 @click.argument('input-file-path', type=click.Path(exists=True, dir_okay=False))
-def main(input_file_path):
-    run_classification(input_file_path)
+@click.argument('output-file-path', type=click.Path(exists=False, dir_okay=False))
+def main(input_file_path, output_file_path):
+    run_classification(input_file_path, output_file_path)
 
 
 if __name__ == '__main__':
